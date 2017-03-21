@@ -1,5 +1,4 @@
 #include <scheduler.h>
-#include <iostream>
 
 using namespace kronos;
 

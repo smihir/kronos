@@ -9,11 +9,6 @@
 #pragma once
 namespace kronos {
 typedef module::ModuleInterface TaskInterface;
-//class TaskInterface : public module::ModuleInterface{
-//    public:
-//        virtual void run() = 0;
-//        virtual ~TaskInterface();
-//};
 
 class Scheduler {
     private:

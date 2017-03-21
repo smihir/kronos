@@ -1,5 +1,4 @@
 #include <module.h>
-#include <iostream>
 
 using namespace kronos::module;
 

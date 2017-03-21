@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 
 project(kron)
 
@@ -15,6 +15,8 @@ if(APPLE)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
+add_compile_options(-DSPDLOG_ENABLE_SYSLOG)
 include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/external/spdlog/include")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/modules")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/core")
