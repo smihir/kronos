@@ -4,13 +4,8 @@ project(kron)
 
 option(KRON_DEBUG "Compile with debug symbols" OFF)
 
-if(UNIX)
-	set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-	find_package(Threads REQUIRED)
-	if(CMAKE_USE_PTHREADS_INIT)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-	endif()
-	target_link_libraries (kronos ${CMAKE_THREAD_LIBS_INIT})
+if(KRON_DEBUG)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 if(UNIX)
@@ -21,5 +16,5 @@ if(APPLE)
 endif()
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/sched")
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/modules")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/core")

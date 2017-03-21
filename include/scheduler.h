@@ -1,16 +1,19 @@
 #include <chrono>
 #include <functional>
+#include <future>
+#include <module.h>
 #include <mutex>
 #include <queue>
 #include <thread>
 
 #pragma once
-namespace kron {
-class TaskInterface {
-    public:
-        virtual void run() = 0;
-        virtual ~TaskInterface();
-};
+namespace kronos {
+typedef module::ModuleInterface TaskInterface;
+//class TaskInterface : public module::ModuleInterface{
+//    public:
+//        virtual void run() = 0;
+//        virtual ~TaskInterface();
+//};
 
 class Scheduler {
     private:
@@ -18,6 +21,7 @@ class Scheduler {
             TaskInterface *task;
             std::chrono::system_clock::time_point exec_time;
             bool is_recurring;
+            std::chrono::system_clock::duration interval;
             bool operator<(const struct SchedulerTask &t) const {
                 return exec_time < t.exec_time;
             }
@@ -26,19 +30,23 @@ class Scheduler {
             }
         };
     public:
-        Scheduler() : running(false) {}
+        Scheduler() : running(false), stop(false) {}
         ~Scheduler();
-        void runEvery(TaskInterface &task, std::chrono::system_clock::duration interval);
-        void runAt(TaskInterface &task, std::chrono::system_clock::time_point time);
+        // FIXME: dont use c style pointers, indenitify the transfer of ownership and fix this
+        void runEvery(TaskInterface *task, std::chrono::system_clock::duration interval);
+        void runAt(TaskInterface *task, std::chrono::system_clock::time_point time);
         void start();
         void schedule();
     private:
         std::thread main_thread;
         bool running;
+        bool stop;
 
-        std::mutex wait_lock;
+        // FIXME: use lock to protect the priority_queue
+        //std::mutex wait_lock;
         std::priority_queue<struct SchedulerTask, std::vector<struct SchedulerTask>, std::less<struct SchedulerTask> > wait_q;
 
+        std::vector<std::pair<std::thread, std::future<void> > > active_tasks;
 };
 
 } /* namespace kron */

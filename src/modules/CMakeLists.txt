@@ -1,0 +1,2 @@
+file(GLOB MODULES "*.cpp")
+set(SRC ${MODULES} PARENT_SCOPE)

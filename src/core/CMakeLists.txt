@@ -1,2 +1,1 @@
-add_executable(kronos kronos.cpp)
-target_link_libraries(kronos LINK_PUBLIC scheduler)
+add_executable(kronos kronos.cpp scheduler.cpp module.cpp ${SRC})
