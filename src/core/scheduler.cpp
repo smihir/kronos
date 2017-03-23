@@ -45,7 +45,10 @@ void Scheduler::schedule() {
             struct SchedulerTask task = wait_q.top();
             if (task.exec_time >= std::chrono::system_clock::now()) {
                 std::packaged_task<void()> ptask([this, task]() {
-                        task.task->run();
+                        // TODO: catch exceptions and do not try to
+                        // persist on exception.
+                        auto data = task.task->run();
+                        task.task->persist(data);
                         if (task.is_recurring) {
                             this->runEvery(task.task, task.interval);
                         }

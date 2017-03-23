@@ -8,6 +8,7 @@
  * not satisfied with the implementation as evident by the number of FIXMEs
  * and GOTCHAs. But it works! 
  */
+#include <db.h>
 #include <map>
 #include <string>
 
@@ -16,14 +17,36 @@ namespace kronos {
 namespace module {
 // Base module class, the scheduler's task is
 // inherited from this abstract class.
-// FIXME: ModuleInteraface can be simplified
-// by removing run() and using inheritance
-// instead of typedefs for Scheduler's TaskInterface
 class ModuleInterface {
     public:
-        virtual void run() = 0;
+        virtual float run() = 0;
         virtual ~ModuleInterface() {};
+        virtual void persist(float &data) {};
 };
+
+class PersistModule : public ModuleInterface {
+    public:
+        PersistModule(std::string name) : store(name) {
+            kronos::db::DatastoreFactory factory("sqlite3");
+            db = factory.getDatastore();
+            if (!db->connect()) {
+                throw "failed to connect to the database";
+            }
+            if (!db->do_query("CREATE TABLE IF NOT EXISTS " + store +
+                    " (val REAL);")) {
+                throw "failed to create table";
+            }
+        }
+        ~PersistModule() {
+            db->disconnect();
+            delete db;
+        }
+        void persist(float& data);
+    private:
+        std::string store;
+        kronos::db::DatastoreInterface *db;
+};
+
 
 // This interface is required to resolve cyclic dependencies
 // between ModuleFactory and ModuleRegistrar

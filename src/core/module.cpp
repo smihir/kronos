@@ -19,3 +19,10 @@ ModuleInterface* ModuleFactory::GetModule(std::string name) {
     }
     return entry->second->GetModule();
 }
+
+void PersistModule::persist(float& data) {
+    if (!db->do_query("INSERT INTO " + store + " VALUES (" +
+                std::to_string(data) + ")")) {
+        throw "failed to insert in store";
+    }
+}

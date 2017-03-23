@@ -1,4 +1,5 @@
 #include <chrono>
+#include <db.h>
 #include <functional>
 #include <future>
 #include <module.h>
@@ -8,6 +9,10 @@
 
 #pragma once
 namespace kronos {
+// TaskInterface is implemented by every module and
+// provides a set of methods which scheduler executes
+// to collect the measurement numbers and persist the
+// measured values.
 typedef module::ModuleInterface TaskInterface;
 
 class Scheduler {
