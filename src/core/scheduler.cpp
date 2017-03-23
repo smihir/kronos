@@ -1,7 +1,9 @@
 #include <scheduler.h>
+#include <spdlog/spdlog.h>
 
 using namespace kronos;
 
+auto schedlogger = spdlog::stdout_color_mt("scheduler");
 // TODO: wait for all other worker threads to exit
 Scheduler::~Scheduler() {
     main_thread.join();
@@ -47,8 +49,14 @@ void Scheduler::schedule() {
                 std::packaged_task<void()> ptask([this, task]() {
                         // TODO: catch exceptions and do not try to
                         // persist on exception.
-                        auto data = task.task->run();
-                        task.task->persist(data);
+                        try {
+                            auto data = task.task->run();
+                            task.task->persist(data);
+                        } catch (const char *e) {
+                            schedlogger->critical("exception: " + std::string(e));
+                        } catch (...) {
+                            schedlogger->critical("default unhandled exception");
+                        }
                         if (task.is_recurring) {
                             this->runEvery(task.task, task.interval);
                         }

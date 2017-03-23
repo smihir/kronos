@@ -1,6 +1,10 @@
 #include <db.h>
+#include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace kronos::db;
+
+auto dblogger = spdlog::stdout_color_mt("db");
 
 bool Sqlite3Datastore::connect() {
     int rc = sqlite3_open(dbname.c_str(), &db);
@@ -22,6 +26,7 @@ bool Sqlite3Datastore::do_query(std::string query) {
     char *err;
     int rc = sqlite3_exec(db, query.c_str(), NULL, 0, &err);
     if (rc != SQLITE_OK) {
+        dblogger->error("do_query failed with error: " + std::string(err));
         sqlite3_free(err);
         return false;
     }
