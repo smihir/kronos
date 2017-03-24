@@ -3,8 +3,8 @@
 #include <functional>
 #include <future>
 #include <module.h>
+#include <locked_pq.h>
 #include <mutex>
-#include <queue>
 #include <thread>
 
 #pragma once
@@ -22,8 +22,8 @@ class Scheduler {
             TaskInterface *task;
             std::chrono::system_clock::time_point exec_time;
             // FIXME: make schedulertask a class and initialize
-            // is recurring. also add appropriate constructors
-            // to satisfy the init routies in runEvery() and
+            // is_recurring. also add appropriate constructors
+            // to satisfy the init in runEvery() and
             // runAt()
             bool is_recurring;
             std::chrono::system_clock::duration interval;
@@ -53,9 +53,9 @@ class Scheduler {
         // FIXME: use lock to protect the priority_queue.
         // write a new class called locked_pq, dont worry about its performance.
         //std::mutex wait_lock;
-        std::priority_queue<struct SchedulerTask,
+        locked_priority_queue<struct SchedulerTask,
             std::vector<struct SchedulerTask>,
-            std::less<struct SchedulerTask> > wait_q;
+            std::greater<struct SchedulerTask> > wait_q;
 
         std::vector<std::pair<std::thread, std::future<void> > > active_tasks;
 };
