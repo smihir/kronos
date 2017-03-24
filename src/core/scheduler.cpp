@@ -2,9 +2,22 @@
 
 using namespace kronos;
 
-// TODO: wait for all other worker threads to exit
 Scheduler::~Scheduler() {
     main_thread.join();
+
+    // wait for worker threads to exit
+    while (active_tasks.size() != 0) {
+        auto it = active_tasks.begin();
+        while(it != active_tasks.end()) {
+            if(it->second.wait_for(std::chrono::milliseconds(0)) ==
+                    std::future_status::ready) {
+                it->first.join();
+                it = active_tasks.erase(it);
+            } else {
+                it++;
+            }
+        }
+    }
 }
 
 void Scheduler::start() {
@@ -49,7 +62,7 @@ void Scheduler::schedule() {
                         // persist on exception.
                         auto data = task.task->run();
                         task.task->persist(data);
-                        if (task.is_recurring) {
+                        if (!this->stop && task.is_recurring) {
                             this->runEvery(task.task, task.interval);
                         }
                         return;
