@@ -1,6 +1,9 @@
 #include <scheduler.h>
+#include <spdlog/spdlog.h>
 
 using namespace kronos;
+
+auto schedlogger = spdlog::stdout_color_mt("scheduler");
 
 Scheduler::~Scheduler() {
     main_thread.join();
@@ -58,12 +61,20 @@ void Scheduler::schedule() {
             struct SchedulerTask task = wait_q.top();
             if (task.exec_time >= std::chrono::system_clock::now()) {
                 std::packaged_task<void()> ptask([this, task]() {
-                        // TODO: catch exceptions and do not try to
-                        // persist on exception.
-                        auto data = task.task->run();
-                        task.task->persist(data);
-                        if (!this->stop && task.is_recurring) {
-                            this->runEvery(task.task, task.interval);
+                        // this exception handling makes sure that a single
+                        // bad module does not bring down the entire scheduler.
+                        // The task which throws an exception is not scheduled
+                        // again.
+                        try {
+                            auto data = task.task->run();
+                            task.task->persist(data);
+                            if (!this->stop && task.is_recurring) {
+                                this->runEvery(task.task, task.interval);
+                            }
+                        } catch (const char *e) {
+                            schedlogger->critical("exception: " + std::string(e));
+                        } catch (...) {
+                            schedlogger->critical("default unhandled exception");
                         }
                         return;
                     });

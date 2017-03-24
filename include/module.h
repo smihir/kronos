@@ -33,7 +33,8 @@ class PersistModule : public ModuleInterface {
                 throw "failed to connect to the database";
             }
             if (!db->do_query("CREATE TABLE IF NOT EXISTS " + store +
-                    " (val REAL);")) {
+                    " (val REAL, "
+                    " Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);")) {
                 throw "failed to create table";
             }
         }

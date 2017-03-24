@@ -1,4 +1,6 @@
 #include <module.h>
+#include <chrono>
+#include <ctime>
 
 using namespace kronos::module;
 
@@ -22,7 +24,7 @@ ModuleInterface* ModuleFactory::GetModule(std::string name) {
 
 void PersistModule::persist(float& data) {
     if (!db->do_query("INSERT INTO " + store + " VALUES (" +
-                std::to_string(data) + ")")) {
+                std::to_string(data) + "," + "datetime('now')" + ")")) {
         throw "failed to insert in store";
     }
 }
