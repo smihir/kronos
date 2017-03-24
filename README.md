@@ -3,7 +3,7 @@ Kronos is a simple periodic task scheduler. Each task is run in a separate threa
 
 ## Compiling
 ```
-cmake . && make # required cmake > 2.8.12
+cmake . && make
 ```
 The binary will be generated in src/core directory and it will be called kronos.
 
