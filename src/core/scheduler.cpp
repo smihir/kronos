@@ -57,9 +57,9 @@ void Scheduler::runAt(TaskInterface *task,
 // round of execution.
 void Scheduler::schedule() {
     while(!stop) {
-        if (!wait_q.empty()) {
+        while (!wait_q.empty()) {
             struct SchedulerTask task = wait_q.top();
-            if (task.exec_time >= std::chrono::system_clock::now()) {
+            if (task.exec_time < std::chrono::system_clock::now()) {
                 std::packaged_task<void()> ptask([this, task]() {
                         // this exception handling makes sure that a single
                         // bad module does not bring down the entire scheduler.
