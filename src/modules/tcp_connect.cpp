@@ -1,12 +1,14 @@
+/*
+ * Logs the time required to establish tcp connection to google.com
+ */
 #include <cstring>
 #include <cerrno>
 #include <module.h>
-#include <spdlog/spdlog.h>
-
 #include <netdb.h>
-#include <sys/types.h>
 #include <netinet/in.h>
+#include <spdlog/spdlog.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 
 using namespace kronos::module;
 

@@ -1,3 +1,6 @@
+/*
+ * Logs the memory of this application to the datastore
+ */
 #include <fstream>
 #include <module.h>
 #include <spdlog/spdlog.h>
