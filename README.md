@@ -1,5 +1,5 @@
 # Kronos
-Kronos is a simple periodic task scheduler. Each task is run in a separate thread. Task is written as a C++ class, example of a simple module is [here](src/modules/test.cpp). The scheduler has been tested on Ubuntu 14.04. The scheduler can be compiled and run on OSX, but some modules will not work on OSX.
+Kronos is a simple periodic task scheduler. Each task is run in a separate thread. Task is written as a C++ class in a Kronos module, example of a simple module is [here](src/modules/test.cpp). The scheduler has been tested on Ubuntu 14.04. The scheduler can be compiled and run on OSX, but some modules will not work on OSX.
 
 ## Compiling
 ```
