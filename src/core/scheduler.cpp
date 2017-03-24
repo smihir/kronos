@@ -1,3 +1,4 @@
+#include <mutex>
 #include <scheduler.h>
 #include <spdlog/spdlog.h>
 
@@ -57,17 +58,20 @@ void Scheduler::runAt(TaskInterface *task,
 // round of execution.
 void Scheduler::schedule() {
     while(!stop) {
+        std::mutex persist_lock;
         while (!wait_q.empty()) {
             struct SchedulerTask task = wait_q.top();
             if (task.exec_time < std::chrono::system_clock::now()) {
-                std::packaged_task<void()> ptask([this, task]() {
+                std::packaged_task<void()> ptask([this, task, &persist_lock]() {
                         // this exception handling makes sure that a single
                         // bad module does not bring down the entire scheduler.
                         // The task which throws an exception is not scheduled
                         // again.
                         try {
                             auto data = task.task->run();
+                            persist_lock.lock();
                             task.task->persist(data);
+                            persist_lock.unlock();
                             if (!this->stop && task.is_recurring) {
                                 this->runEvery(task.task, task.interval);
                             }
