@@ -11,6 +11,7 @@
 #include <db.h>
 #include <map>
 #include <string>
+#include <vector>
 
 #pragma once
 namespace kronos {
@@ -61,8 +62,11 @@ class ModuleFactory {
         // Get Singleton instance
         static ModuleFactory& Get();
         // FIXME: dont use pointers, figure out a way to fix the 2 funcs
-        void Register(ModuleRegistrarInterface *registrar, std::string name);
+        void Register(ModuleRegistrarInterface *registrar, std::string name,
+                        unsigned int sec);
         ModuleInterface* GetModule(std::string name);
+        unsigned int GetModuleInterval(std::string name);
+        std::vector<std::string> GetModuleNames();
 
         ModuleFactory(ModuleFactory const&) = delete;
         void operator=(ModuleFactory const&) = delete;
@@ -70,13 +74,14 @@ class ModuleFactory {
     private:
         ModuleFactory() {}
         // FIXME: no pointers
-        std::map<std::string, ModuleRegistrarInterface*> registry;
+        std::map<std::string, std::pair<ModuleRegistrarInterface*, int>
+            > registry;
 };
 
 template<class T>
 class ModuleRegistrar : public ModuleRegistrarInterface {
     public:
-        ModuleRegistrar(std::string classname);
+        ModuleRegistrar(std::string classname, unsigned int sec);
         // FIXME: no pointers
         ModuleInterface* GetModule();
 };
@@ -89,9 +94,9 @@ class ModuleRegistrar : public ModuleRegistrarInterface {
 // of creating a static archive for all the modules and linking
 // them to the executable.
 template<class T>
-ModuleRegistrar<T>::ModuleRegistrar(std::string classname) {
+ModuleRegistrar<T>::ModuleRegistrar(std::string classname, unsigned int sec) {
     ModuleFactory &factory = ModuleFactory::Get();
-    factory.Register(this, classname);
+    factory.Register(this, classname, sec);
 }
 
 template<class T>
@@ -102,8 +107,8 @@ ModuleInterface* ModuleRegistrar<T>::GetModule() {
 } /* namespace module */
 } /* namespace kronos */
 
-#define REGISTER(CLASSNAME) \
+#define REGISTER(CLASSNAME,sec) \
     namespace { \
         static kronos::module::ModuleRegistrar<CLASSNAME> \
-        CLASSNAME##_registrar(#CLASSNAME); \
+        CLASSNAME##_registrar(#CLASSNAME,sec); \
     };

@@ -16,4 +16,4 @@ class PrintTask : public PersistModule {
         ~PrintTask(){}
 };
 
-REGISTER(PrintTask);
+REGISTER(PrintTask,10);
